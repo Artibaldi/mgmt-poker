@@ -1,0 +1,6 @@
+Management Poker (Управленческий покер)
+Copyright 2026 Arti
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+The only third-party runtime dependency is `requests` (see requirements.txt),
+which remains under its own license.

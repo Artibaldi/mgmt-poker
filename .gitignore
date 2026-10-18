@@ -1,0 +1,16 @@
+# Данные о реальных людях — только локально, никогда в git
+sessions/*
+!sessions/.gitkeep
+
+# Креды и локальная конфигурация Jira
+.env
+config/jira.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# macOS
+.DS_Store

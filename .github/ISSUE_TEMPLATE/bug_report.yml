@@ -1,0 +1,54 @@
+name: Ошибка
+description: Что-то работает не так, как описано в README
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за сообщение! **Не прикладывайте данные о реальных людях** — воспроизводите на демо-колоде.
+        Проблемы безопасности сюда не пишите — см. SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: Версия
+      description: Хеш коммита (`git rev-parse --short HEAD`)
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Где
+      options:
+        - Выгрузка из Jira
+        - Сигналы
+        - Колода и валидация
+        - Игра за столом
+        - Итоги и экспорт
+        - Скилл /poker
+        - Запуск и тесты
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: Что произошло и что ожидалось?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Как повторить
+      description: Команды и шаги на examples/demo-cards.json.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Вывод команды или консоль браузера
+      description: Уберите логины, имена и ключи задач.
+      render: shell
+  - type: input
+    id: env
+    attributes:
+      label: Окружение
+      description: ОС, браузер, версия Python, версия Jira

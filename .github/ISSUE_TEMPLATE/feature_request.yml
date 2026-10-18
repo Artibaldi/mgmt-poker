@@ -1,0 +1,30 @@
+name: Предложение
+description: Идея для подготовки колоды или для игры
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую проблему это решает?
+      description: Для кого и в какой момент подготовки или сессии.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Что предлагаете?
+    validations:
+      required: true
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Принципы проекта
+      options:
+        - label: Не превращает сигналы в рейтинг сотрудников
+          required: true
+        - label: Ничего не пишет в Jira и другие системы, данные о людях остаются локально
+          required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Альтернативы

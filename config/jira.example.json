@@ -1,0 +1,13 @@
+{
+  "_comment": "Маппинг полей вашей Jira. Скопируйте в config/jira.json и поправьте id. Узнать id: GET /rest/api/2/field. Ненужные роли удалите, эпик можно null.",
+  "verify_ssl": true,
+  "pause_seconds": 2.0,
+  "epic_field": "customfield_10001",
+  "role_fields": {
+    "acceptor": "customfield_10002",
+    "setter": "customfield_10003",
+    "responsible": "customfield_10004"
+  },
+  "scriptrunner_commented": false,
+  "workday": {"start_hour": 7, "end_hour": 22}
+}
