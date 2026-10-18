@@ -162,7 +162,7 @@ const SCALE = [1, 2, 3, 5, 8, "?"];
 const STEPS = [1, 2, 3, 5, 8];
 const SCALE_TEXT = { 1: "не проявлено", 2: "эпизодически", 3: "проявлено", 5: "устойчиво", 8: "образцово, задаёт стандарт другим", "?": "не знаю — нужен разговор" };
 const MARKER = { strength: "Гипотеза: сильная сторона", growth: "Гипотеза: зона роста", disputed: "Гипотеза: спорный сигнал", question: "Слепая зона — данных нет" };
-const SUIT_NAME = Object.assign({ "♠": "Владение и методология", "♥": "Люди", "♦": "Коммуникация и стык", "♣": "Самоорганизация и эскалация" }, (DATA && DATA.meta.suits) || {});
+const SUIT_NAME = Object.assign({ "♠": "Профессиональные навыки", "♦": "Софт-навыки", "♣": "Личные качества и самоорганизация", "♥": "Управленческие навыки" }, (DATA && DATA.meta.suits) || {});
 const KEY = "mgmt-poker:" + (DATA ? DATA.meta.id : "demo");
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -248,7 +248,7 @@ function avg(xs) { const n = xs.filter((x) => typeof x === "number"); return n.l
 
 function summaryModel() {
   const facts = DATA.cards.filter((c) => c.marker !== "question");
-  const suits = ["♠", "♥", "♦", "♣"].map((s) => {
+  const suits = ["♠", "♦", "♣", "♥"].map((s) => {
     const cs = facts.filter((c) => c.suit === s && vote(c).revealed);
     return { s, name: SUIT_NAME[s], n: cs.length, a: avg(cs.map((c) => vote(c).a)), b: avg(cs.map((c) => vote(c).b)) };
   }).filter((x) => facts.some((c) => c.suit === x.s));

@@ -5,6 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **One suit model everywhere:** ♠ hard skills · ♦ soft skills · ♣ personal qualities · ♥ management — in signals,
+  the offline game, the demo deck and the docs (previously the offline mode used older cluster names).
+- **Docs brought up to date with the online mode:** method (two modes side by side), Jira integration (automatic
+  and manual preparation), contributing (where each kind of change goes), security (room links, relay storage,
+  LLM), PR template; new `CLAUDE.md` with the project map and hard rules for agents.
+
 ## [0.2.0] — 2026-10-18
 
 Online sessions: two screens, a sealed deck, a competency model.

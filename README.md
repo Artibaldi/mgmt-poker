@@ -223,9 +223,12 @@ open sessions/jdoe_2026-06/game.html
 - **Fact card:** an episode from the period (when, where, what was done) + a question about the competence +
   a source you can open.
 - **Question card:** a blind spot with no digital trace — a question for the table, no estimate.
-- **Suits are competence clusters:** ♠ ownership and method · ♥ people · ♦ communication and interfaces ·
-  ♣ self-management and escalation.
-- **Manager's hypothesis** per card: strength, growth area, disputed signal or blind spot. Hidden until the reveal.
+- **Suits are skill groups** of the competency model: ♠ professional (hard) skills for the position · ♦ soft
+  skills · ♣ personal qualities and self-management · ♥ management. Details: [docs/competencies.md](docs/competencies.md).
+- **Online deck:** generated from the role profile; each card carries behavioral anchors for every level and,
+  after the reveal, “what the data shows”.
+- **Offline deck:** written by hand; the manager's hypothesis per card (strength, growth area, disputed signal
+  or blind spot) is hidden until the reveal.
 - At least as many strengths as growth areas. Facts are written without judgement words.
 
 </details>
@@ -269,7 +272,7 @@ Full method: [docs/method.md](docs/method.md) (Russian).
 | `overdue` | own issue overdue at the end of the period | ♣ Deadlines |
 | `tracker-post-factum` | ≥ 4 own transitions within 60 minutes | ♣ Tracker as a tool |
 | `off-hours` | ≥ 3 actions outside working hours or on weekends | ♣ Workload |
-| `self-set` | the person put themselves into role fields | ♠ Process ownership |
+| `self-set` | the person put themselves into role fields | ♣ Ownership |
 | `handoff` / `silent-tracker` | comments with @-mentions / no comments at all | ♦ Digital trail and handoff |
 
 Every signal is a hypothesis with issue keys. What Jira cannot show — growing people, verbal escalations,

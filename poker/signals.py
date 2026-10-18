@@ -14,11 +14,11 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
 
-SUITS = {
-    "♠": "Владение и методология",
-    "♥": "Люди",
-    "♦": "Коммуникация и стык",
-    "♣": "Самоорганизация и эскалация",
+SUITS = {  # как в competencies/common.json
+    "♠": "Профессиональные навыки (хард)",
+    "♦": "Софт-навыки",
+    "♣": "Личные качества и самоорганизация",
+    "♥": "Управленческие навыки",
 }
 DUEDATE_FIELDS = {"duedate", "Due Date", "Срок исполнения"}
 BATCH_WINDOW = timedelta(minutes=60)
@@ -121,7 +121,7 @@ def compute(activity, workday=(7, 22)):
     self_set = {k: d["self_set_fields"] for k, d in details.items() if d.get("self_set_fields")}
     facts["self_set_fields"] = self_set
     if self_set:
-        add("self-set", "♠", "Владение процессом",
+        add("self-set", "♣", "Ответственность и владение",
             f"Сотрудник проставил себя в поля-роли, задач: {len(self_set)}", list(self_set),
             "Реальное решение/ответственность или формальное назначение скриптом?")
 

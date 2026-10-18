@@ -28,7 +28,7 @@
         "properties": {
           "id": {"type": ["integer", "string"]},
           "suit": {"enum": ["♠", "♥", "♦", "♣"],
-                   "description": "♠ владение и методология, ♥ люди, ♦ коммуникация и стык, ♣ самоорганизация и эскалация"},
+                   "description": "♠ профессиональные (хард), ♦ софт-навыки, ♣ личные качества и самоорганизация, ♥ управленческие — как в competencies/common.json"},
           "competence": {"type": "string"},
           "marker": {"enum": ["strength", "growth", "disputed", "question"],
                      "description": "Гипотеза руководителя; в игре видна только после вскрытия. question — карта-вопрос без оценки"},
