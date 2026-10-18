@@ -1,0 +1,8 @@
+{
+  "_comment": "Скопируйте в config/team.json (в git не попадает). login — логин в Jira; role — id из competencies/roles; name — как обращаться в карточках.",
+  "manager": {"name": "Ирина"},
+  "people": {
+    "jdoe": {"name": "Алексей", "role": "team-lead"},
+    "asmith": {"name": "Мария", "role": "system-analyst"}
+  }
+}

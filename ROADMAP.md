@@ -4,14 +4,16 @@ Management Poker grows in small stages. Done stages are in the [changelog](CHANG
 
 ## Now
 
-- Run the first sessions on the format and tune card wording and signal thresholds from the results.
-- A month-to-month comparison: load last month's summary next to the new deck.
+- Run the first online sessions and tune signal thresholds, card wording and role weights from the results.
+- Quality journal: facts marked “inaccurate” at the table feed back into the generator.
+- A month-to-month comparison in the summary: last time's averages next to this time's.
 
 ## Next
 
-- **Two hands on two devices:** each player estimates on their own phone, the reveal happens on the shared screen.
 - **Jira Cloud:** filtering by `accountId`.
 - Signals from meeting notes: mentions, decisions and promises made by the person.
+- Hard-skill signals from Jira: returns to an earlier status, reopened issues, linked defects.
+- HTTPS out of the box for the relay (self-signed or corporate certificate).
 - A deck generator that drafts cards from `signals.json` without an LLM, for review by the manager.
 
 ## Later

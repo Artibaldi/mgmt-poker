@@ -1,0 +1,7 @@
+{
+  "_comment": "Скопируйте в config/relay.json. public_url — адрес, по которому сотрудник откроет комнату (IP в VPN или имя хоста).",
+  "host": "0.0.0.0",
+  "port": 8765,
+  "public_url": "http://10.0.0.5:8765",
+  "room_ttl_days": 14
+}

@@ -166,24 +166,14 @@ def fetch_person_details(jira, key, login, start, end_excl):
     }
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--login", required=True, help="jira-login")
-    ap.add_argument("--from", dest="date_from", required=True, help="YYYY-MM-DD")
-    ap.add_argument("--to", dest="date_to", required=True, help="YYYY-MM-DD (включительно)")
-    ap.add_argument("--max-issues", type=int, help="ограничить число задач (проверочный прогон)")
-    ap.add_argument("--roles", action="store_true", help="добавить задачи по полям-ролям/worklog/комментариям")
-    ap.add_argument("--env", help="путь к .env с JIRA_* (иначе $POKER_ENV или ./.env)")
-    ap.add_argument("--out", help="каталог вывода (по умолчанию sessions/<login>_<YYYY-MM>)")
-    args = ap.parse_args()
-
-    env, cfg = load_env(args.env), load_jira_config()
+def collect(env, cfg, login, date_from, date_to, roles=False, max_issues=None):
+    """Выгрузка активности человека за период → dict (формат activity.json)."""
     missing = [k for k in ("JIRA_URL", "JIRA_PROJECT_KEY", "JIRA_USERNAME", "JIRA_PASSWORD") if not env.get(k)]
     if missing:
-        sys.exit(f"нет {', '.join(missing)}: заполните .env (см. .env.example) или передайте --env")
-    jira, proj, login = Jira(env, cfg), env["JIRA_PROJECT_KEY"], args.login
-    start = args.date_from
-    end_excl = (date.fromisoformat(args.date_to) + timedelta(days=1)).isoformat()
+        raise SystemExit(f"нет {', '.join(missing)}: заполните .env (см. .env.example) или передайте --env")
+    jira, proj = Jira(env, cfg), env["JIRA_PROJECT_KEY"]
+    start = date_from
+    end_excl = (date.fromisoformat(date_to) + timedelta(days=1)).isoformat()
     per = f'updated >= "{start}" AND updated < "{end_excl}"'
     fields = FIELDS + [f for f in [cfg.get("epic_field"), *cfg.get("role_fields", {}).values()] if f]
 
@@ -191,7 +181,7 @@ def main():
     print(f"== issues: {jql} ==", file=sys.stderr)
     issues = slim(jira.search(jql, fields), cfg)
     buckets = {"assignee_or_reporter": [r["key"] for r in issues]}
-    if args.roles:
+    if roles:
         extra = {role: f"project = {proj} AND cf[{cf.split('_')[1]}] = {login} AND {per}"
                  for role, cf in cfg.get("role_fields", {}).items()}
         extra["worklog"] = (f'project = {proj} AND worklogAuthor = {login} '
@@ -213,29 +203,45 @@ def main():
                     issues.append(r)
     for r in issues:
         r["roles"] = [b for b, keys in buckets.items() if keys and r["key"] in keys]
-    if args.max_issues:
-        issues = issues[: args.max_issues]
+    if max_issues:
+        issues = issues[:max_issues]
 
     details = []
     for i, row in enumerate(issues, 1):
         print(f"== details {i}/{len(issues)}: {row['key']} ==", file=sys.stderr)
         details.append(fetch_person_details(jira, row["key"], login, start, end_excl))
 
-    result = {
+    return {
         "login": login,
-        "period": [args.date_from, args.date_to],
+        "period": [date_from, date_to],
         "project": proj,
         "fetched_at": datetime.now().isoformat(timespec="seconds"),
         "buckets": {k: (len(v) if v is not None else None) for k, v in buckets.items()},
         "issues": issues,
         "details": details,
     }
-    out_dir = Path(args.out) if args.out else session_dir(login, start[:7])
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--login", required=True, help="jira-login")
+    ap.add_argument("--from", dest="date_from", required=True, help="YYYY-MM-DD")
+    ap.add_argument("--to", dest="date_to", required=True, help="YYYY-MM-DD (включительно)")
+    ap.add_argument("--max-issues", type=int, help="ограничить число задач (проверочный прогон)")
+    ap.add_argument("--roles", action="store_true", help="добавить задачи по полям-ролям/worklog/комментариям")
+    ap.add_argument("--env", help="путь к .env с JIRA_* (иначе $POKER_ENV или ./.env)")
+    ap.add_argument("--out", help="каталог вывода (по умолчанию sessions/<login>_<YYYY-MM>)")
+    args = ap.parse_args()
+
+    result = collect(load_env(args.env), load_jira_config(), args.login, args.date_from, args.date_to,
+                     roles=args.roles, max_issues=args.max_issues)
+    details = result["details"]
+    out_dir = Path(args.out) if args.out else session_dir(args.login, args.date_from[:7])
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / "activity.json"
     path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({
-        "issues": len(issues),
+        "issues": len(result["issues"]),
         "comments": sum(len(d["comments"]) for d in details),
         "transitions": sum(len(d["transitions"]) for d in details),
         "field_changes": sum(len(d["field_changes"]) for d in details),

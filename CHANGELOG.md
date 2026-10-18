@@ -5,6 +5,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-10-18
+
+Online sessions: two screens, a sealed deck, a competency model.
+
+### Added
+
+- **Competency model:** 4 suits (hard, soft, personal qualities, management), 18 common competencies and 8 role
+  profiles (system and business analyst, developer, QA, DevOps, architect, project manager, team lead) with
+  behavioral anchors for every level.
+- **Automatic deck** (`poker.new`, `poker/deck.py`): the manager picks only the person and the period; cards come
+  from Jira signals, behavioral questions and follow-ups of last time's agreements; auto-check; content-free report.
+- **Seal:** stdlib encryption of the deck, key split between the two links; opens only when both are in the room.
+- **Online room** (`poker.relay`, `poker/web/`): lobby, frame, read → blind estimate with “why” (commit–reveal) →
+  reveal with “what the data shows” → co-signed agreement; pause and “go back”; recording timecodes; summary
+  confirmed by both; export for both players (Markdown, PDF via print).
+- **Claude connection** (`--llm claude`): episodes from comments, each verified against the export;
+  `POKER_LLM_CMD` for other providers, `scripts/llm_anthropic.py` for the API.
+- **Docs:** online session spec and trust model, step-by-step local deployment, model connection guide,
+  competency model.
+- **Tests:** relay (live server, cheating attempts), deck for all roles, seal, LLM validation, Node tests for the
+  room core.
+
 ## [0.1.0] — 2026-10-18
 
 The first MVP.
@@ -23,5 +45,6 @@ The first MVP.
   license, contributing and security guides, roadmap, issue and PR templates, CI, Dependabot.
 - **Privacy:** `sessions/` git-ignored, hygiene check in tests and CI.
 
-[Unreleased]: https://github.com/Artibaldi/mgmt-poker/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Artibaldi/mgmt-poker/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Artibaldi/mgmt-poker/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Artibaldi/mgmt-poker/releases/tag/v0.1.0

@@ -1,0 +1,350 @@
+{
+ "login": "jdoe",
+ "period": [
+  "2026-09-01",
+  "2026-09-30"
+ ],
+ "project": "PAY",
+ "buckets": {},
+ "issues": [
+  {
+   "key": "PAY-101",
+   "summary": "Валидация ИНН в платёжной форме",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "jdoe",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": null,
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  },
+  {
+   "key": "PAY-114",
+   "summary": "Повтор платежа при таймауте шлюза",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "jdoe",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": null,
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  },
+  {
+   "key": "PAY-120",
+   "summary": "Интеграция с антифрод-сервисом",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "jdoe",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": "2026-09-24",
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  },
+  {
+   "key": "PAY-131",
+   "summary": "Отчёт по возвратам",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "jdoe",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": null,
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  },
+  {
+   "key": "PAY-140",
+   "summary": "Релиз 2.4",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "jdoe",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": null,
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  },
+  {
+   "key": "PAY-105",
+   "summary": "Справочник банков: обновление",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "dev.junior",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": "2026-09-15",
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  },
+  {
+   "key": "PAY-106",
+   "summary": "Лимиты по картам: доработка",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "dev.junior",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": "2026-09-18",
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  },
+  {
+   "key": "PAY-150",
+   "summary": "Мелкая доработка PAY-150",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "jdoe",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": null,
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  },
+  {
+   "key": "PAY-151",
+   "summary": "Мелкая доработка PAY-151",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "jdoe",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": null,
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  },
+  {
+   "key": "PAY-152",
+   "summary": "Мелкая доработка PAY-152",
+   "type": "Задача",
+   "status": "В работе",
+   "assignee": "jdoe",
+   "reporter": "jdoe",
+   "created": "2026-09-01T10:00:00.000+0300",
+   "resolved": null,
+   "duedate": null,
+   "priority": "Средний",
+   "resolution": null,
+   "components": [],
+   "epic": null
+  }
+ ],
+ "details": [
+  {
+   "key": "PAY-101",
+   "summary": "Валидация ИНН в платёжной форме",
+   "status": "В работе",
+   "comments": [
+    {
+     "created": "2026-09-05T11:20:00.000+0300",
+     "body": "Сняли из спринта две задачи без владельца, причины описал в каждой. [~qa.lead] прошу посмотреть сценарии ошибок."
+    }
+   ],
+   "transitions": [],
+   "field_changes": [],
+   "worklogs": [],
+   "worklog_hours": 0,
+   "self_set_fields": []
+  },
+  {
+   "key": "PAY-114",
+   "summary": "Повтор платежа при таймауте шлюза",
+   "status": "В работе",
+   "comments": [
+    {
+     "created": "2026-09-12T16:05:00.000+0300",
+     "body": "Готово к тесту: пути проверки и тестовые данные на странице сценариев. [~tester] можно тестировать."
+    }
+   ],
+   "transitions": [],
+   "field_changes": [],
+   "worklogs": [],
+   "worklog_hours": 0,
+   "self_set_fields": []
+  },
+  {
+   "key": "PAY-120",
+   "summary": "Интеграция с антифрод-сервисом",
+   "status": "В работе",
+   "comments": [
+    {
+     "created": "2026-09-19T18:11:00.000+0300",
+     "body": "Ждём ответа внешней команды, срок сдвигаем."
+    }
+   ],
+   "transitions": [],
+   "field_changes": [
+    {
+     "created": "2026-09-10T18:00:00.000+0300",
+     "field": "duedate",
+     "from": "2026-09-12",
+     "to": "2026-09-19"
+    },
+    {
+     "created": "2026-09-19T18:10:00.000+0300",
+     "field": "duedate",
+     "from": "2026-09-19",
+     "to": "2026-09-24"
+    }
+   ],
+   "worklogs": [],
+   "worklog_hours": 0,
+   "self_set_fields": []
+  },
+  {
+   "key": "PAY-131",
+   "summary": "Отчёт по возвратам",
+   "status": "В работе",
+   "comments": [],
+   "transitions": [
+    {
+     "created": "2026-09-17T10:00:00.000+0300",
+     "field": "status",
+     "from": "a",
+     "to": "b"
+    },
+    {
+     "created": "2026-09-17T10:02:00.000+0300",
+     "field": "status",
+     "from": "a",
+     "to": "b"
+    },
+    {
+     "created": "2026-09-17T10:05:00.000+0300",
+     "field": "status",
+     "from": "a",
+     "to": "b"
+    },
+    {
+     "created": "2026-09-17T10:08:00.000+0300",
+     "field": "status",
+     "from": "a",
+     "to": "b"
+    },
+    {
+     "created": "2026-09-17T10:11:00.000+0300",
+     "field": "status",
+     "from": "a",
+     "to": "b"
+    }
+   ],
+   "field_changes": [],
+   "worklogs": [],
+   "worklog_hours": 0,
+   "self_set_fields": []
+  },
+  {
+   "key": "PAY-140",
+   "summary": "Релиз 2.4",
+   "status": "В работе",
+   "comments": [],
+   "transitions": [],
+   "field_changes": [
+    {
+     "created": "2026-09-21T23:40:00.000+0300",
+     "field": "duedate",
+     "from": "2026-09-25",
+     "to": "2026-09-28"
+    }
+   ],
+   "worklogs": [
+    {
+     "started": "2026-09-21T23:10:00.000+0300",
+     "hours": 1.5,
+     "comment": ""
+    },
+    {
+     "started": "2026-09-22T06:50:00.000+0300",
+     "hours": 1,
+     "comment": ""
+    }
+   ],
+   "worklog_hours": 2.5,
+   "self_set_fields": []
+  },
+  {
+   "key": "PAY-105",
+   "summary": "Справочник банков: обновление",
+   "status": "В работе",
+   "comments": [],
+   "transitions": [],
+   "field_changes": [],
+   "worklogs": [],
+   "worklog_hours": 0,
+   "self_set_fields": []
+  },
+  {
+   "key": "PAY-106",
+   "summary": "Лимиты по картам: доработка",
+   "status": "В работе",
+   "comments": [],
+   "transitions": [],
+   "field_changes": [],
+   "worklogs": [],
+   "worklog_hours": 0,
+   "self_set_fields": []
+  },
+  {
+   "key": "PAY-150",
+   "summary": "Мелкая доработка PAY-150",
+   "status": "В работе",
+   "comments": [],
+   "transitions": [],
+   "field_changes": [],
+   "worklogs": [],
+   "worklog_hours": 0,
+   "self_set_fields": []
+  },
+  {
+   "key": "PAY-151",
+   "summary": "Мелкая доработка PAY-151",
+   "status": "В работе",
+   "comments": [],
+   "transitions": [],
+   "field_changes": [],
+   "worklogs": [],
+   "worklog_hours": 0,
+   "self_set_fields": []
+  },
+  {
+   "key": "PAY-152",
+   "summary": "Мелкая доработка PAY-152",
+   "status": "В работе",
+   "comments": [],
+   "transitions": [],
+   "field_changes": [],
+   "worklogs": [],
+   "worklog_hours": 0,
+   "self_set_fields": []
+  }
+ ]
+}

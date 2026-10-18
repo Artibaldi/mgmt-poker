@@ -15,6 +15,7 @@
 
 [**See it**](#see-it) ·
 [**Quick start**](#quick-start) ·
+[**Online session**](docs/spec-online.md) ·
 [**Rules**](#rules) ·
 [**How it works**](#how-it-works) ·
 [**Honest limits**](#status-and-honest-limits)
@@ -27,7 +28,13 @@
 facts instead of impressions. Episodes from the period — pulled from Jira and meeting notes — go on cards.
 Both players estimate each card **blind**, reveal, and talk about the **gap**. The gap is the agenda.
 
-The tool prepares the deck from Jira and runs the session as a single offline HTML file.
+**Online mode:** the manager only picks the person and the period. The deck is built automatically
+from the role's competency model (hard skills for the position, soft skills, personal qualities, management)
+and **sealed** — nobody sees the cards before the meeting. During a recorded video call each player estimates
+on their own screen; estimates are committed as hashes, so neither side can see the other's until both have
+played. Afterwards the employee downloads both sides' answers.
+
+An offline single-screen mode (one HTML file) is still there for in-person sessions.
 
 > [!NOTE]
 > The interface and the method docs are in Russian. This README is the English entry point;
@@ -40,12 +47,22 @@ Performance conversations usually fail in the same few places:
 | In a typical 1:1… | …Management Poker's answer |
 |---|---|
 | 💭 **“Feels like you're not escalating enough.”** | Every card is a concrete episode with a source you can open at the table: an issue key, a comment, a meeting note. |
-| 🪞 **The self-review drifts toward the manager's opinion.** | Estimates are blind. The manager's hypothesis (strength / growth area) is shown only **after** the reveal. |
+| 🪞 **The self-review drifts toward the manager's opinion.** | Estimates are blind — sealed until both have played. What the data shows appears only **after** the reveal. Nobody, the manager included, sees the cards before the meeting. |
 | 📊 **Metrics turn into a ranking.** | Jira signals are hypotheses for the manager to check, not scores. There is no comparison between people. |
 | 🗣️ **The talk spreads over everything.** | Where you agree, you move on. Where you differ by two steps or more, you stop and talk. |
 | 📝 **Agreements evaporate.** | Each card gets a one-line outcome; the summary exports to Markdown. |
 
 ## See it
+
+**Online room** — each player on their own screen during a recorded call:
+
+| Before the deal: the deck opens for both at once | Blind estimate: the other side sees only “card placed ✓” |
+|---|---|
+| <img src="docs/screenshots/room-frame.png" alt="Rules screen with the deck composition by suit"> | <img src="docs/screenshots/room-blind_guest.png" alt="Employee's screen: anchors for each level, the manager's card is placed face down"> |
+| **Reveal, “why”, data and a co-signed agreement** | **Summary — the employee can download both sides' answers** |
+| <img src="docs/screenshots/room-reveal_host.png" alt="Both estimates with reasons, gap, what the data shows and an agreement confirmed by both"> | <img src="docs/screenshots/room-summary_guest.png" alt="Summary by suit, agreements, all cards with timecodes, export buttons"> |
+
+**Offline single-screen game:**
 
 | Blind estimate | Reveal and the gap |
 |---|---|
@@ -65,6 +82,32 @@ All screenshots use the fictional deck from [`examples/demo-cards.json`](example
 ## What you get
 
 <table>
+<tr>
+<td width="33%" valign="top">
+
+#### 🔐 A sealed deck
+
+Built automatically from Jira and the role profile. The key is split between the two links — the cards
+open only when both players are in the room.
+
+</td>
+<td width="33%" valign="top">
+
+#### 🖥️🖥️ Two screens, one table
+
+A tiny stdlib relay on the manager's laptop, reachable over VPN. Commit–reveal keeps estimates blind even
+from the relay itself.
+
+</td>
+<td width="33%" valign="top">
+
+#### 🧭 8 role profiles
+
+System and business analyst, developer, QA, DevOps, architect, project manager, team lead — each with
+behavioral anchors for every level.
+
+</td>
+</tr>
 <tr>
 <td width="33%" valign="top">
 
@@ -120,6 +163,20 @@ the method and a fictional example.
 
 ## Quick start
 
+### Online room, without Jira (Python 3.9+, no dependencies)
+
+```bash
+git clone https://github.com/Artibaldi/mgmt-poker.git && cd mgmt-poker
+python3 -m poker.relay &                                   # the room on :8765
+python3 -m poker.new --login demo --from 2026-09-01 --to 2026-09-30 \
+  --role team-lead --name Алексей --activity examples/demo-activity.json --relay http://localhost:8765
+# open the two printed links in two different browsers (e.g. a normal and a private window)
+```
+
+A real session — Jira, VPN, the team registry, Claude — step by step: [docs/deploy-local.md](docs/deploy-local.md) (Russian).
+
+### Offline single-screen game
+
 Try the game without Jira (Python 3.9+, no dependencies):
 
 ```bash
@@ -129,7 +186,7 @@ python3 -m poker.build examples/demo-cards.json --out /tmp/demo.html
 open /tmp/demo.html          # or xdg-open on Linux
 ```
 
-Prepare a real session:
+Prepare an offline deck by hand:
 
 ```bash
 cp .env.example .env                              # JIRA_URL, JIRA_PROJECT_KEY, credentials
@@ -144,7 +201,9 @@ open sessions/jdoe_2026-06/game.html
 
 | Script | What it does |
 |---|---|
-| `scripts/test.sh` | Every check: unit tests, demo build, JS syntax of the template, no tracked session data |
+| `python3 -m poker.relay` | The room for online sessions ([deploy-local.md](docs/deploy-local.md)) |
+| `python -m poker.new` | Create a meeting: person + period → sealed deck + two links |
+| `scripts/test.sh` | Every check: Python and Node tests, demo build, JS syntax, no tracked session data |
 
 <details>
 <summary>Configuration</summary>
@@ -222,11 +281,17 @@ chat work — goes into question cards. Details: [docs/jira-integration.md](docs
 
 ```
 poker/
-  fetch.py               Jira (read-only, REST v2) → sessions/<login>_<YYYY-MM>/activity.json
-  signals.py             activity.json → signals.md / signals.json (hypotheses with issue keys)
-  build.py               cards.json + template → game.html (validation, safe embedding)
-  template/game.html     the game: one file, vanilla JS, no network
-  config.py              .env, field mapping, session folder
+  new.py                 person + period → Jira → deck by role → seal → room with two links
+  deck.py                competency model → 12 cards: facts from signals, behavioral questions, follow-ups
+  llm.py                 optional: Claude finds episodes in comments; every one is verified against the export
+  seal.py                stdlib encryption of the deck; key = half₁ ⊕ half₂ from the two links
+  relay.py               the room: event log, blind protocol checks, long-poll, results on close
+  web/room.html, core.js the online client; core.js = SHA-256, unseal, commit–reveal, reduce(), export
+  fetch.py               Jira (read-only, REST v2) → activity
+  signals.py             activity → signals (hypotheses with issue keys)
+  build.py               cards.json + template → game.html (offline mode)
+  template/game.html     the offline game: one file, vanilla JS, no network
+competencies/            common.json (18 shared competencies) + roles/*.json (8 roles, hard skills, weights)
 prompts/                 dossier.md and cards.md — prompts for Claude
 schema/                  cards.schema.json — the deck contract
 examples/                a fictional deck for demos and tests
@@ -254,6 +319,11 @@ scripts/test.sh
 
 - **`tests/test_signals.py`** — each signal fires on a crafted activity and stays quiet on a calm month.
 - **`tests/test_build.py`** — deck validation, embedding, protection against breaking out of `<script>`.
+- **`tests/test_deck.py`** — the model for all 8 roles, deck building, follow-ups, LLM evidence, sanitizing.
+- **`tests/test_relay.py`** — a live relay: tokens, host-only actions, early reveal, re-commit and vote
+  substitution are refused, close needs both confirmations.
+- **`tests/test_seal.py`, `tests/test_llm.py`, `tests/core.test.js`** — seal round-trip and tampering, LLM
+  output validation, the shared reducer and the blind flow in Node.
 - **Template** — JS syntax check with Node.
 - **Hygiene** — the check fails if anything under `sessions/` except `.gitkeep` is tracked.
 
@@ -265,7 +335,9 @@ Management Poker is an **MVP**. What it does not do yet:
 
 - Jira Cloud is not supported: user `name` is hidden there, filtering needs `accountId`.
 - The dossier and the deck are written with Claude from prompts; there is no non-LLM generator.
-- A session is played on one screen; there is no two-device mode with truly separate hands.
+- The relay speaks plain http: fine inside a VPN, needs an HTTPS proxy anywhere else.
+- The manager runs the generator and sends the employee's link, so technically both key halves pass through
+  their hands — the seal protects the process, not against a determined admin (see the trust model).
 - The interface is Russian only.
 
 What's next is in the [roadmap](ROADMAP.md).

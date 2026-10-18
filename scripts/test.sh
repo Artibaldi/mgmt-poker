@@ -18,6 +18,9 @@ import re, sys
 print(re.search(r"<script>(.*)</script>", open(sys.argv[1], encoding="utf-8").read(), re.S).group(1))
 PYEOF
   node --check "${out%.html}.js"
+  node --check poker/web/core.js
+  echo "== room core (node --test)"
+  node --test tests/core.test.js
 else
   echo "   node not found — skipped"
 fi
