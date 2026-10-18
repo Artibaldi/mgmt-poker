@@ -1,2 +1,2 @@
 # Only poker.fetch needs this; build and signals use the standard library.
-requests>=2.31
+requests>=2.34.2
