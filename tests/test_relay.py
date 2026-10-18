@@ -80,7 +80,8 @@ class RelayTest(unittest.TestCase):
     def test_hello_half_cannot_be_replaced(self):
         self.assertEqual(self.ev("guest", "hello", name="А", half=self.half["guest"])[0], 200)
         self.assertEqual(self.ev("guest", "hello", name="А", half=self.half["guest"])[0], 200)
-        self.assertEqual(self.ev("guest", "hello", name="А", half="AAAA")[0], 409)
+        self.assertEqual(self.ev("guest", "hello", name="А", half="A" * 43)[0], 409)
+        self.assertEqual(self.ev("guest", "hello", name="А", half="короткая")[0], 400)
 
     def test_close_requires_both_confirmations_and_writes_results(self):
         self.assertEqual(self.ev("host", "close")[0], 409)
@@ -96,6 +97,32 @@ class RelayTest(unittest.TestCase):
         status, body = self.call("guest")
         self.assertEqual(status, 200)
         self.assertTrue(any(e["type"] == "close" for e in body["events"]))
+
+    def test_rejects_malformed_events(self):
+        self.vote("host", 2, 8, "x")
+        self.vote("guest", 2, 100, "x")
+        self.assertEqual(self.ev("guest", "reveal", card=2, vote=100, why="x", salt="s")[0], 400, "оценка вне шкалы")
+        self.assertEqual(self.ev("host", "draft", card=2, text="я" * 501)[0], 400, "слишком длинный текст")
+        self.assertEqual(self.ev("host", "read", card="1; drop")[0], 400, "card — только номер")
+        self.assertEqual(self.ev("host", "nav", card="../../etc")[0], 400)
+        self.assertEqual(self.ev("host", "hello", name=["список"], half=self.half["host"])[0], 400)
+
+    def test_negative_content_length_and_security_headers(self):
+        import socket
+        with socket.create_connection(("127.0.0.1", self.port), timeout=3) as s:
+            s.sendall(f"POST /api/r/{self.room}/events HTTP/1.1\r\nHost: x\r\nX-Poker-Token: {self.tok['host']}\r\n"
+                      "Content-Length: -5\r\n\r\n".encode())
+            self.assertIn(b" 400 ", s.recv(64))
+        with urllib.request.urlopen(f"http://127.0.0.1:{self.port}/r/{self.room}", timeout=5) as r:
+            self.assertEqual(r.headers["Server"].strip(), "mgmt-poker")
+            self.assertEqual(r.headers["X-Frame-Options"], "DENY")
+            self.assertIn("frame-ancestors 'none'", r.headers["Content-Security-Policy"])
+            self.assertEqual(r.headers["Referrer-Policy"], "no-referrer")
+
+    def test_session_files_are_private(self):
+        modes = {f.name: oct(f.stat().st_mode & 0o777) for f in self.session.iterdir()}
+        self.assertTrue(all(m == "0o600" for m in modes.values()), modes)
+        self.assertEqual(oct(self.session.stat().st_mode & 0o777), "0o700")
 
     def test_events_are_ordered_and_incremental(self):
         self.ev("host", "hello", name="Ирина", half=self.half["host"])

@@ -19,6 +19,19 @@ Management Poker is an **MVP for personal use** by a manager on their own machin
 - **Offline game.** The session lives in the browser's `localStorage`. Anyone with access to that browser
   profile can read the estimates and notes. Use “Начать заново” after the session or keep the JSON export safe.
 
+## Hardening in place
+
+- Relay: role tokens compared in constant time; every event validated (types, card numbers, vote scale,
+  text lengths, base64url key halves); commit–reveal enforced server-side; body size limits; no version in
+  the `Server` header; CSP with `frame-ancestors 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`,
+  `Cache-Control: no-store`; no CORS headers, so other sites cannot read the API.
+- Files: session folders are created `0700`, files in them `0600` (links with tokens, sealed deck, room log,
+  results).
+- Browser: all text is escaped before it reaches HTML; nothing is loaded from the network; your own sealed vote is
+  kept in `localStorage` only until it has been revealed. Links carry tokens after `#`, which browsers do not send
+  to servers but do keep in history — use a private window on a shared computer.
+- CI: actions pinned to commit SHAs (Dependabot keeps them current), workflow token is read-only.
+
 ## People's data
 
 Activity exports, dossiers, decks, room logs, built games and session results describe real people. They

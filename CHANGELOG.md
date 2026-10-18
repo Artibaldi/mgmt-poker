@@ -5,6 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Security
+
+- Relay: constant-time token check; server-side validation of every event (card numbers, vote scale, text
+  lengths, key-half format); negative `Content-Length` rejected; no Python version in `Server`; clickjacking
+  protection (`frame-ancestors 'none'`, `X-Frame-Options`).
+- Session folders `0700`, files `0600`; the browser drops your stored vote once it has been revealed.
+- CI actions pinned to commit SHAs.
+
 ### Changed
 
 - **One suit model everywhere:** ♠ hard skills · ♦ soft skills · ♣ personal qualities · ♥ management — in signals,

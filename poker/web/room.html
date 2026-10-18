@@ -186,6 +186,7 @@ async function onState() {
   if (!deck) return;
   for (const c of deck.cards) {           // вскрытие: как только печати положили оба
     const st = S.cards[c.id];
+    if (st && st.reveals[ROLE]) { delete mem[voteKey(c.id)]; try { localStorage.removeItem(voteKey(c.id)); } catch (e) {} }
     if (st && st.commits.host && st.commits.guest && !st.reveals[ROLE]) {
       const mine = recall(voteKey(c.id));
       if (mine && !mine.sent) { mine.sent = true; store(voteKey(c.id), mine); await post("reveal", { card: c.id, vote: mine.vote, why: mine.why, salt: mine.salt }); }

@@ -12,6 +12,7 @@
 import argparse
 import hashlib
 import json
+import os
 import secrets
 import sys
 from datetime import datetime, timedelta, timezone
@@ -55,6 +56,8 @@ def create(activity, *, login, role, name, manager, date_from, date_to, relay_ur
     if (session / "room.json").exists() and not force:
         raise SystemExit(f"встреча уже создана: {session}/room.json (пересоздать — --force)")
     session.mkdir(parents=True, exist_ok=True)
+    for d in (Path(sessions), session):          # данные о людях — только владельцу
+        d.chmod(0o700)
 
     common, roles = load_model()
     llm_evidence, llm_note = [], "LLM не использовалась"
@@ -85,6 +88,8 @@ def create(activity, *, login, role, name, manager, date_from, date_to, relay_ur
         "Ссылки встречи. Ссылку сотрудника отправьте ему вместе с приглашением на ВКС.\n"
         "Половина ключа колоды — в каждой ссылке: открыть колоду по одной ссылке нельзя.\n\n"
         f"Руководитель: {url['host']}\nСотрудник:    {url['guest']}\n", encoding="utf-8")
+    for f in session.iterdir():
+        f.chmod(0o600)
     return session, deck, errors, llm_note, url
 
 

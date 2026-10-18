@@ -10,7 +10,9 @@
 """
 import argparse
 import hashlib
+import hmac
 import json
+import os
 import re
 import threading
 from datetime import datetime, timezone
@@ -27,6 +29,10 @@ TYPES = {"hello", "ready", "rec", "nav", "read", "drop", "commit", "reveal", "dr
 HOST_ONLY = {"rec", "nav", "drop", "close", "export"}
 MAX_EVENT, MAX_EXPORT, POLL_SECONDS = 4096, 512 * 1024, 25
 ROOM_RE = re.compile(r"^[A-Za-z0-9_-]{6,40}$")
+HALF_RE = re.compile(r"^[A-Za-z0-9_-]{43}$")          # 32 байта в base64url
+VOTES = {1, 2, 3, 5, 8, "?"}
+TEXT_LIMITS = {"name": 80, "why": 500, "text": 500, "owner": 80, "due": 80}
+CARD_EVENTS = {"read", "drop", "commit", "reveal", "draft", "agree", "back"}
 
 
 def now():
@@ -53,7 +59,7 @@ class Room:
 
     def role_for(self, token):
         h = hashlib.sha256((token or "").encode()).hexdigest()
-        return next((r for r, v in self.meta["tokens"].items() if v == h), None)
+        return next((r for r, v in self.meta["tokens"].items() if hmac.compare_digest(v, h)), None)
 
     def expired(self):
         return datetime.fromisoformat(self.meta["expires"]) < datetime.now(timezone.utc)
@@ -83,10 +89,17 @@ class Room:
             raise RoomError(HTTPStatus.FORBIDDEN, "это действие ведущего")
         if not isinstance(d, dict):
             raise RoomError(HTTPStatus.BAD_REQUEST, "data должно быть объектом")
+        for k, limit in TEXT_LIMITS.items():
+            if k in d and (not isinstance(d[k], str) or len(d[k]) > limit):
+                raise RoomError(HTTPStatus.BAD_REQUEST, f"поле {k}: строка до {limit} символов")
+        if t in CARD_EVENTS and not (isinstance(d.get("card"), int) and 0 <= d["card"] < 1000):
+            raise RoomError(HTTPStatus.BAD_REQUEST, "card — номер карты")
+        if t == "nav" and not (d.get("card") == "summary" or (isinstance(d.get("card"), int) and 0 <= d["card"] < 1000)):
+            raise RoomError(HTTPStatus.BAD_REQUEST, "card — номер карты или summary")
         card = str(d.get("card"))
         if t == "hello":
             half = d.get("half")
-            if not isinstance(half, str) or len(half) > 64:
+            if not isinstance(half, str) or not HALF_RE.match(half):
                 raise RoomError(HTTPStatus.BAD_REQUEST, "нет половины ключа")
             if st["halves"].get(role) not in (None, half):
                 raise RoomError(HTTPStatus.CONFLICT, "другая половина ключа для этой роли")
@@ -96,6 +109,8 @@ class Room:
             if role in st["commits"].get(card, {}):
                 raise RoomError(HTTPStatus.CONFLICT, "карта уже положена")
         if t == "reveal":
+            if d.get("vote") not in VOTES or isinstance(d.get("vote"), bool):
+                raise RoomError(HTTPStatus.BAD_REQUEST, "оценка — 1, 2, 3, 5, 8 или ?")
             if set(st["commits"].get(card, {})) != {"host", "guest"}:
                 raise RoomError(HTTPStatus.CONFLICT, "вскрытие — только когда положили оба")
             if role in st["reveals"].get(card, set()):
@@ -116,7 +131,7 @@ class Room:
             e = {"seq": len(self.events) + 1, "ts": now(), "role": role, "type": t, "data": d}
             self.events.append(e)
             self._apply(e)
-            with self.log.open("a", encoding="utf-8") as f:
+            with open(os.open(self.log, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600), "a", encoding="utf-8") as f:
                 f.write(json.dumps(e, ensure_ascii=False) + "\n")
             if t == "close":
                 self._write_results()
@@ -125,9 +140,12 @@ class Room:
 
     def _write_results(self):
         ex = self.state["export"]
-        (self.dir / "results.md").write_text(ex.get("md", ""), encoding="utf-8")
         summary = dict(ex.get("summary") or {}, period=self.meta["period"], date=now()[:10])
-        (self.dir / "results.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+        for name, text in (("results.md", str(ex.get("md", ""))),
+                           ("results.json", json.dumps(summary, ensure_ascii=False, indent=2))):
+            path = self.dir / name
+            path.write_text(text, encoding="utf-8")
+            path.chmod(0o600)
 
     def since(self, n, wait):
         with self.cond:
@@ -158,6 +176,7 @@ class Rooms:
 def make_handler(rooms, quiet=False):
     class Handler(BaseHTTPRequestHandler):
         server_version = "mgmt-poker"
+        sys_version = ""
 
         def log_message(self, fmt, *args):  # без токенов и тел запросов
             if not quiet:
@@ -172,7 +191,9 @@ def make_handler(rooms, quiet=False):
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
             self.send_header("Content-Security-Policy",
-                             "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:")
+                             "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
+                             "img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+            self.send_header("X-Frame-Options", "DENY")
             self.end_headers()
             self.wfile.write(data)
 
@@ -219,6 +240,8 @@ def make_handler(rooms, quiet=False):
                     return self._send(404, {"error": "не найдено"})
                 room, role = self._room(parts[2])
                 size = int(self.headers.get("Content-Length", "0"))
+                if size < 0:
+                    raise RoomError(HTTPStatus.BAD_REQUEST, "неверный Content-Length")
                 if size > MAX_EXPORT:
                     raise RoomError(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, "слишком большое событие")
                 body = json.loads(self.rfile.read(size) or b"{}")
